@@ -104,7 +104,7 @@ void EntityPathTrace::OnFrameUpdate(const SGameUpdateEvent &p_UpdateEvent) {
         return;
     }
 
-    const auto currentItemSpatial = m_currentTraceItem->m_rPhysicsAccessor.m_ref.QueryInterface<ZSpatialEntity>();
+    const auto currentItemSpatial = m_currentTraceItem->m_rPhysicsAccessor.m_entityRef.QueryInterface<ZSpatialEntity>();
     if (!currentItemSpatial) {
         m_currentTraceItem = nullptr;
         m_currentTraceItemAction = nullptr;
@@ -152,12 +152,12 @@ void EntityPathTrace::DrawTraceLines(IRenderer *p_Renderer) {
         return;
     }
 
-    const auto currentItemSpatial = m_currentTraceItem->m_rPhysicsAccessor.m_ref.QueryInterface<ZSpatialEntity>();
+    const auto currentItemSpatial = m_currentTraceItem->m_rPhysicsAccessor.m_entityRef.QueryInterface<ZSpatialEntity>();
 
     p_Renderer->DrawOBB3D(
        SVector3(-.1f, -.1f, -.1f),
        SVector3(.1f, .1f, .1f),
-       currentItemSpatial->GetWorldMatrix(),
+       currentItemSpatial->GetObjectToWorldMatrix(),
        SVector4(1, 1, 1, .5f)
        );
 
@@ -219,7 +219,7 @@ DEFINE_PLUGIN_DETOUR(EntityPathTrace, bool, PinOutput, ZEntityRef entity, uint32
 
     if(traceableItem) {
         Logger::Debug("\tZHM5Item found!");
-        if(traceableItem->m_rPhysicsAccessor.m_ref.QueryInterface<ZSpatialEntity>()) {
+        if(traceableItem->m_rPhysicsAccessor.m_entityRef.QueryInterface<ZSpatialEntity>()) {
             Logger::Debug("\tZSpatialEntity found!");
             Logger::Debug("{}", traceableItem->m_pItemConfigDescriptor->m_sTitle.ToStringView());
             if(traceableItem->m_pItemConfigDescriptor->m_sTitle.ToStringView().contains("Breach")) {
@@ -244,7 +244,7 @@ DEFINE_PLUGIN_DETOUR(EntityPathTrace, bool, PinOutput, ZEntityRef entity, uint32
                     return { HookAction::Continue() };
                 }
 
-                if(currItem->m_pItemConfigDescriptor->m_RepositoryId == traceableItem->m_pItemConfigDescriptor->m_RepositoryId) {
+                if(currItem->m_pItemConfigDescriptor->m_ItemID == traceableItem->m_pItemConfigDescriptor->m_ItemID) {
                     Logger::Debug("\tFound matching entity!");
 
                     if(currItem->m_pItemConfigDescriptor->m_sTitle.ToStringView().contains("Taser") || currItem->m_pItemConfigDescriptor->m_sTitle.ToStringView().contains("EMP")) {
@@ -276,7 +276,7 @@ DEFINE_PLUGIN_DETOUR(EntityPathTrace, bool, PinOutput, ZEntityRef entity, uint32
     return { HookAction::Continue() };
 }
 
-DEFINE_PLUGIN_DETOUR(EntityPathTrace, void, OnLoadScene, ZEntitySceneContext* th, SSceneInitParameters&) {
+DEFINE_PLUGIN_DETOUR(EntityPathTrace, bool, OnLoadScene, ZEntitySceneContext* th, SSceneInitParameters&) {
     m_showTraceLines = false;
     m_currentTraceItem = nullptr;
     m_currentTraceItemAction = nullptr;

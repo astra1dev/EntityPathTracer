@@ -4,7 +4,7 @@ project(EntityPathTrace CXX)
 
 # Find latest version at https://github.com/OrfeasZ/ZHMModSDK/releases
 # Set ZHMMODSDK_DIR variable to a local directory to use a local copy of the ZHMModSDK.
-set(ZHMMODSDK_VER "v4.0.0-rc.2")
+set(ZHMMODSDK_VER "v4.0.0-rc.3")
 include(cmake/setup-zhmmodsdk.cmake)
 
 # Set C++ standard to C++23.
@@ -26,6 +26,7 @@ target_link_libraries(EntityPathTrace
     ZHMModSDK
     Microsoft::DirectX-Guids
     Microsoft::DirectX-Headers
+    implot
 )
 
 install(TARGETS EntityPathTrace
